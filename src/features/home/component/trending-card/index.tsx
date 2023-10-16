@@ -33,6 +33,10 @@ const TrendingCard: FC<TrendingCardProps> = ({ article }) => {
 							alt={article.title}
 							fill
 							className="object-contain"
+							sizes="100vw"
+							priority
+							placeholder="blur"
+							blurDataURL={article.urlToImage}
 						/>
 					) : (
 						<div className="">No Image Displayed</div>
@@ -83,6 +87,9 @@ const TrendingCard: FC<TrendingCardProps> = ({ article }) => {
 								sizes="100vw"
 								fill
 								className=" object-cover"
+								priority
+								placeholder="blur"
+								blurDataURL={article.urlToImage}
 							/>
 						) : (
 							<div className="">No Image Displayed</div>

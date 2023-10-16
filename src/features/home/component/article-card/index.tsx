@@ -23,7 +23,11 @@ const Article: FC<{
 						src={article.urlToImage}
 						alt={article.title}
 						fill
+						sizes="100vw"
 						className="object-cover "
+						priority
+						placeholder="blur"
+						blurDataURL={article.urlToImage}
 					/>
 				) : (
 					<div className="">No Image Displayed</div>
