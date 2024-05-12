@@ -4,15 +4,24 @@ import { getCountryCode } from "@/utils/location";
 import { AxiosResponse, type AxiosError } from "axios";
 
 export const getEverythingNews = async (
-	query: string
+	query: string,
+	page?: number,
+	pageSize?: number
 ): Promise<INewsApiResponse | IErrorResponse> => {
 	let url = `/everything`;
-	if (query) {
-		url = `${url}?q=${query}`;
-	}
+
+	const body = {
+		params: {
+			q: query ? query : "us",
+			page: page ? page : 1,
+			pageSize: pageSize ? pageSize : 12,
+		},
+	};
+
 	try {
 		const response: AxiosResponse<INewsApiResponse> = await axiosInstance.get(
-			url
+			url,
+			body
 		);
 		const data = response.data;
 		return data;
@@ -30,18 +39,26 @@ export const getEverythingNews = async (
 };
 
 export const getTrendingNews = async (
-	category: string = "general"
+	category: string = "general",
+	page?: number,
+	pageSize?: number
 ): Promise<INewsApiResponse | IErrorResponse> => {
 	let url = "/top-headlines?";
 	try {
 		const countryCode = await getCountryCode();
 
-		if (category) {
-			url = `${url}category=${category.toLowerCase()}&country=us`;
-		}
+		const body = {
+			params: {
+				category: category ? category : "general",
+				page: page ? page : 1,
+				pageSize: pageSize ? pageSize : 12,
+				country: "us",
+			},
+		};
 
 		const response: AxiosResponse<INewsApiResponse> = await axiosInstance.get(
-			url
+			url,
+			body
 		);
 		const data = response.data;
 		return data;
@@ -51,6 +68,7 @@ export const getTrendingNews = async (
 		return {
 			code: err.code as string,
 			message: err.message,
+			status: err.response?.status as number,
 		} as IErrorResponse;
 	}
 };

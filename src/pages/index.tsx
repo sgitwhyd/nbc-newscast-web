@@ -1,37 +1,58 @@
 import Head from "next/head";
 
-import { IArticle, IErrorResponse, INewsApiResponse } from "@/types/news";
+import { IErrorResponse, INewsApiResponse } from "@/types/news";
 import TrendingCard from "@/features/home/component/trending-card";
 import BreakingNews from "@/features/home/section/breaking-news";
 import LatestStories from "@/features/home/section/latest-stories";
+import NoCategoryFound from "@/components/no-category-found";
+import ErroBoundaries from "@/components/error-boundaries";
 
 import { getEverythingNews, getTrendingNews } from "@/services/news.service";
 
 export const getServerSideProps = async (context: {
 	query: {
 		category: string;
+		page: number;
 	};
 }) => {
 	const category = context.query.category;
+	const trendingPageSize = 6;
+	const trendingCurrentPage = context.query.page
+		? Number(context.query.page)
+		: 1;
+
 	const [everythingNews, trendingNews] = await Promise.all([
-		getEverythingNews("elon musk"),
-		getTrendingNews(category ? category : "general"),
+		getEverythingNews("prabowo", 1, 1),
+		getTrendingNews(
+			category ? category : "general",
+			trendingCurrentPage,
+			trendingPageSize
+		),
 	]);
 
-	if ((everythingNews.status as number) >= 404) {
-		const { message } = trendingNews as IErrorResponse;
+	if (
+		(trendingNews.status as number) >= 404 ||
+		(everythingNews.status as number) >= 404
+	) {
+		const error = trendingNews as IErrorResponse;
 		return {
 			props: {
-				error: message,
+				error,
 			},
 		};
 	} else {
-		const { articles } = everythingNews as INewsApiResponse;
-		const { articles: trendingArticle } = trendingNews as INewsApiResponse;
+		const everythingNewsData = everythingNews as INewsApiResponse;
+		const trendingNewsData = trendingNews as INewsApiResponse;
+		const trendingNewsTotalItems = trendingNewsData.totalResults;
+
 		return {
 			props: {
-				trendingNews: trendingArticle,
-				everythingNews: articles,
+				trendingNews: trendingNewsData,
+				everythingNews: everythingNewsData,
+				error: null,
+				trendingPageSize,
+				trendingNewsTotalItems,
+				trendingCurrentPage,
 			},
 		};
 	}
@@ -41,10 +62,14 @@ export default function Home({
 	trendingNews,
 	everythingNews,
 	error,
+	trendingPageSize,
+	trendingNewsTotalItems,
 }: {
-	everythingNews: IArticle[];
-	trendingNews: IArticle[];
-	error: string;
+	everythingNews: INewsApiResponse;
+	trendingNews: INewsApiResponse;
+	error: IErrorResponse;
+	trendingPageSize: number;
+	trendingNewsTotalItems: number;
 }) {
 	return (
 		<>
@@ -52,12 +77,22 @@ export default function Home({
 				<title>Newscast App</title>
 			</Head>
 			{error ? (
-				<h1>{error}</h1>
+				<ErroBoundaries error={error} />
+			) : trendingNews.articles.length === 0 ? (
+				<NoCategoryFound />
 			) : (
 				<>
-					<TrendingCard article={trendingNews[0]} />
-					<BreakingNews article={trendingNews[4]} />
-					<LatestStories articles={trendingNews.slice(1, 5)} />
+					<TrendingCard article={everythingNews.articles[0]} />
+					<BreakingNews
+						article={
+							trendingNews.articles[trendingNews.articles.length > 1 ? 2 : 0]
+						}
+					/>
+					<LatestStories
+						articles={trendingNews.articles}
+						pageSize={trendingPageSize}
+						totalItems={trendingNewsTotalItems}
+					/>
 				</>
 			)}
 		</>

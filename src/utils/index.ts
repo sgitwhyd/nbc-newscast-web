@@ -1,4 +1,4 @@
-export const updateSearchParams = (type: string, value: string) => {
+export const updateSearchParams = (type: string, value: any) => {
 	const searchParams = new URLSearchParams(window.location.search);
 
 	if (value === "") {

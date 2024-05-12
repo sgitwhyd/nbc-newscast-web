@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import "nprogress/nprogress.css";
+import "rc-pagination/assets/index.css";
 import type { AppProps } from "next/app";
 import RootLayout from "@/components/layout/root-layout";
 import nProgress from "nprogress";

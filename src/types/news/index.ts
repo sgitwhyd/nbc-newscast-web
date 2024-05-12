@@ -25,7 +25,7 @@ export interface IArticle {
 export interface INewsApiResponse {
 	status: string;
 	totalResults: number;
-	articles: IArticle;
+	articles: IArticle[];
 }
 
 export interface IErrorResponse {

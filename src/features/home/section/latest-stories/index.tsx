@@ -2,6 +2,7 @@ import React, { FC, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { clsx } from "clsx";
+import Pagination from "@/features/home/component/pagination";
 
 import { poppins } from "@/libs/font";
 import ArticleList from "@/features/home/section/article-list";
@@ -14,9 +15,15 @@ const CATEGORY = ["Latest Stories", ...NEWS_CATEGORY];
 
 type LatestStoriesProps = {
 	articles: IArticle[];
+	pageSize: number;
+	totalItems: number;
 };
 
-const LatestStories: FC<LatestStoriesProps> = ({ articles }) => {
+const LatestStories: FC<LatestStoriesProps> = ({
+	articles,
+	pageSize,
+	totalItems,
+}) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const [search, setSearch] = useState("");
@@ -82,11 +89,12 @@ const LatestStories: FC<LatestStoriesProps> = ({ articles }) => {
 					) : (
 						<ArticleList articles={articles} />
 					)}
-					<div className="flex justify-center my-[30px]">
+					{/* <div className="flex justify-center my-[30px]">
 						<button className="text-sm font-medium uppercase text-brand-red-500 border border-brand-red-500 w-[220px] h-[60px]">
 							View More
 						</button>
-					</div>
+					</div> */}
+					<Pagination pageSize={pageSize} totalItems={totalItems} />
 				</div>
 				<div className="flex flex-col col-span-2 lg:col-span-1">
 					<h1 className="text-lg font-semibold mb-2.5">Location News</h1>
